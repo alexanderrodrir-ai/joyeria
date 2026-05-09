@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0B0B0B;--panel:#151515;--border:#2A2A2A;--text:#EAEAEA;--gold:#BFA37A;--gold-light:#D4B98A;--gold-dark:#8A7050;--shadow:rgba(0,0,0,0.8)}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden;min-height:100vh}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+.ambient-layer{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.ambient-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.04;animation:drift 12s ease-in-out infinite}
+.orb1{width:400px;height:400px;background:var(--gold);top:-100px;left:-100px;animation-delay:0s}
+.orb2{width:300px;height:300px;background:#8B7355;top:40%;right:-80px;animation-delay:-4s}
+.orb3{width:250px;height:250px;background:var(--gold);bottom:-50px;left:40%;animation-delay:-8s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,30px) scale(1.1)}}
+
+.hero{position:relative;z-index:1;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border)}
+.hero-eyebrow{font-family:'Inter',sans-serif;font-size:10px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;opacity:.8}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(40px,7vw,80px);font-weight:400;line-height:1.05;letter-spacing:-1px;color:var(--text);margin-bottom:16px}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-subtitle{font-family:'Inter',sans-serif;font-size:13px;letter-spacing:2px;color:#888;text-transform:uppercase;font-weight:300}
+.gold-line{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px auto}
+
+.drawer-scene{position:relative;z-index:1;padding:40px 24px 60px;max-width:1200px;margin:0 auto}
+.drawer-label{font-family:'Inter',sans-serif;font-size:9px;letter-spacing:5px;color:#555;text-transform:uppercase;margin-bottom:24px;text-align:center}
+
+.jewelry-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:auto;gap:12px}
+
+.compartment{position:relative;background:var(--panel);border:1px solid var(--border);border-radius:4px;cursor:pointer;overflow:hidden;transition:all .5s cubic-bezier(.25,.46,.45,.94);box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 4px 20px rgba(0,0,0,.5)}
+.compartment::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(191,163,122,.06) 0%,transparent 50%);opacity:0;transition:opacity .5s ease;z-index:1;pointer-events:none}
+.compartment::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(191,163,122,.08),transparent);transition:left .8s ease;pointer-events:none;z-index:2}
+.compartment:hover::before{opacity:1}
+.compartment:hover::after{left:150%}
+.compartment:hover{border-color:rgba(191,163,122,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(191,163,122,.1);transform:translateY(-2px)}
+.compartment.active{border-color:rgba(191,163,122,.5);box-shadow:0 0 0 1px rgba(191,163,122,.2),0 20px 60px rgba(0,0,0,.8);transform:translateY(-3px)}
+
+.comp-wide{grid-column:span 8}
+.comp-narrow{grid-column:span 4}
+.comp-half{grid-column:span 6}
+.comp-third{grid-column:span 4}
+.comp-quarter{grid-column:span 3}
+@media(max-width:768px){
+  .jewelry-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .comp-wide,.comp-narrow,.comp-half{grid-column:span 2}
+  .comp-third,.comp-quarter{grid-column:span 1}
+}
+@media(max-width:480px){
+  .jewelry-grid{grid-template-columns:1fr;gap:8px}
+  .comp-wide,.comp-narrow,.comp-half,.comp-third,.comp-quarter{grid-column:span 1}
+}
+
+.comp-inner{padding:28px 24px;height:100%;display:flex;flex-direction:column;justify-content:space-between;min-height:160px;position:relative;z-index:3}
+.comp-category{font-family:'Inter',sans-serif;font-size:8px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;opacity:.7;margin-bottom:8px}
+.comp-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:var(--text);line-height:1.2;margin-bottom:6px}
+.comp-count{font-family:'Inter',sans-serif;font-size:10px;color:#555;letter-spacing:1px}
+.comp-visual{width:100%;flex:1;display:flex;align-items:center;justify-content:center;margin:16px 0;min-height:60px}
+.comp-cta{font-family:'Inter',sans-serif;font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase;transition:color .3s}
+.compartment:hover .comp-cta{color:var(--gold)}
+
+.jv-svg{width:auto;height:48px;opacity:.6;transition:all .5s ease;filter:drop-shadow(0 0 0px var(--gold))}
+.compartment:hover .jv-svg{opacity:.9;filter:drop-shadow(0 4px 12px rgba(191,163,122,.4));transform:scale(1.05)}
+
+.velvet-tex{position:absolute;inset:0;opacity:.03;background-image:repeating-linear-gradient(45deg,#fff 0px,transparent 1px,transparent 3px,#fff 4px);pointer-events:none;z-index:0}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(5,5,5,.95);z-index:100;opacity:0;pointer-events:none;transition:opacity .6s ease;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:6px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(30px) scale(.97);transition:transform .6s cubic-bezier(.25,.46,.45,.94);box-shadow:0 40px 100px rgba(0,0,0,.9)}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1)}
+.modal-header{padding:40px 40px 24px;border-bottom:1px solid var(--border);position:relative}
+.modal-eyebrow{font-size:9px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;opacity:.8}
+.modal-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:400;line-height:1.1;color:var(--text)}
+.modal-close{position:absolute;top:32px;right:32px;width:36px;height:36px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px;color:#666;font-size:18px;font-family:'Inter',sans-serif;font-weight:300;transition:all .3s ease}
+.modal-close:hover{border-color:var(--gold);color:var(--gold)}
+.modal-body{padding:32px 40px 40px}
+.modal-desc{font-size:13px;line-height:1.8;color:#888;margin-bottom:32px;max-width:500px}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gallery-item{aspect-ratio:1;background:#1a1a1a;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .4s ease;overflow:hidden;position:relative}
+.gallery-item::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(191,163,122,.08),transparent);opacity:0;transition:opacity .3s}
+.gallery-item:hover{border-color:rgba(191,163,122,.3);transform:scale(1.02)}
+.gallery-item:hover::after{opacity:1}
+.modal-detail{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.detail-item{padding:16px;background:#0f0f0f;border:1px solid var(--border);border-radius:3px}
+.detail-label{font-size:8px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:6px}
+.detail-val{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold)}
+
+.footer{position:relative;z-index:1;text-align:center;padding:40px;border-top:1px solid var(--border)}
+.footer-mark{font-family:'Playfair Display',serif;font-size:11px;color:#3a3a3a;letter-spacing:2px}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border)}
+</style>
+</head>
+<body>
+<h2 class="sr-only">Atelier — portfolio de joyería de lujo que presenta collares, anillos, aretes, pulseras, relojes y más, en una experiencia visual tipo cajón de joyero.</h2>
+
+<div class="ambient-layer">
+  <div class="ambient-orb orb1"></div>
+  <div class="ambient-orb orb2"></div>
+  <div class="ambient-orb orb3"></div>
+</div>
+
+<header class="hero">
+  <div class="hero-eyebrow">Atelier · Est. 1987</div>
+  <h1 class="hero-title">El Arte de la<br><em>Alta Joyería</em></h1>
+  <div class="gold-line"></div>
+  <div class="hero-subtitle">Una colección curada de piezas excepcionales</div>
+</header>
+
+<main class="drawer-scene">
+  <div class="drawer-label">— Colección y Portafolio —</div>
+  <div class="jewelry-grid" id="grid">
+
+    <!-- COLLARES -->
+    <div class="compartment comp-wide" onclick="openModal('collares')">
+      <div class="velvet-tex"></div>
+      <div class="comp-inner">
+        <div>
+          <div class="comp-category">Colección I</div>
+          <div class="comp-title">Collares</div>
+          <div class="comp-count">24 Piezas · Oro y Platino</div>
+        </div>
+        <div class="comp-visual">
+          <svg class="jv-svg" viewBox="0 0 160 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 8 Q80 55 150 8" stroke="#BFA37A" stroke-width="1.5" fill="none"/>
+            <circle cx="80" cy="52" r="6" fill="none" stroke="#BFA37A" stroke-width="1.2"/>
+            <circle cx="80" cy="52" r="2.5" fill="#BFA37A" opacity=".6"/>
+            <circle cx="40" cy="20" r="2" fill="#BFA37A" opacity=".4"/>
+            <circle cx="120" cy="20" r="2" fill="#BFA37A" opacity=".4"/>
+            <circle cx="20" cy="12" r="1.5" fill="#BFA37A" opacity=".3"/>
+            <circle cx="140" cy="12" r="1.5" fill="#BFA37A" opacity=".3"/>
+          </svg>
+        </div>
+        <div class="comp-cta">Ver Colección →</div>
+      </div>
+    </div>
+
+    <!-- ANILLOS -->
+    <div class="compartment comp-narrow" onclick="openModal('anillos')">
+      <div class="velvet-tex"></div>
+      <div class="comp-inner">
+        <div>
+          <div class="comp-category">Colección II</div>
+          <div class="comp-title">Anillos</div>
+          <div class="comp-count">18 Piezas · Solitarios y Argollas</div>
+        </div>
+        <div class="comp-visual">
+          <svg class="jv-svg" viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="40" cy="38" rx="22" ry="24" stroke="#BFA37A" stroke-width="1.5" fill="none"/>
+            <ellipse cx="40" cy="38" rx="14" ry="16" stroke="#BFA37A" stroke-width=".7" fill="none" stroke-dasharray="3 2"/>
+            <polygon points="40,8 47,20 60,20 50,28 54,41 40,33 26,41 30,28 20,20 33,20" fill="none" stroke="#BFA37A" stroke-width="1.2" opacity=".8"/>
+            <circle cx="40" cy="8" r="2.5" fill="#BFA37A" opacity=".7"/>
+          </svg>
+        </div>
+        <div class="comp-cta">Ver Colección →</div>
+      </div>
+    </div>
+
+    <!-- ARETES -->
+    <div class="compartment comp-half" onclick="openModal('aretes')">
+      <div class="velvet-tex"></div>
+      <div class="comp-inner">
+        <div>
+          <div class="comp-category">Colección III</div>
+          <div class="comp-title">Aretes</div>
+          <div class="comp-count">32 Piezas · Colgantes y Broches</div>
+        </div>
+        <div class="comp-visual">
+          <svg class="jv-svg" viewBox="0 0 120 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="38" cy="10" r="5" fill="none" stroke="#BFA37A" stroke-width="1.3"/>
+            <path d="M38 15 L38 35" stroke="#BFA37A" stroke-width="1"/>
+            <ellipse cx="38" cy="48" rx="10" ry="14" fill="none" stroke="#BFA37A" stroke-width="1.2"/>
+            <circle cx="82" cy="10" r="5" fill="none" stroke="#BFA37A" stroke-width="1.3"/>
+            <path d="M82 15 L82 28" stroke="#BFA37A" stroke-width="1"/>
+            <polygon points="82,28 72,40 82,60 92,40" fill="none" stroke="#BFA37A" stroke-width="1.2"/>
+            <line x1="60" y1="5" x2="60" y2="65" stroke="#BFA37A" stroke-width=".3" stroke-dasharray="2 3" opacity=".3"/>
+          </svg>
+        </div>
+        <div class="comp-cta">Ver Colección →</div>
+      </div>
+    </div>
+
+    <!-- RELOJES -->
+    <div class="compartment comp-half" onclick="openModal('relojes')">
+      <div class="velvet-tex"></div>
+      <div class="comp-inner">
+        <div>
+          <div class="comp-category">Colección IV</div>
+          <div class="comp-title">Relojes</div>
+          <div class="comp-count">12 Piezas · Alta Relojería</div>
+        </div>
+        <div class="comp-visual">
+          <svg class="jv-svg" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="5" width="14" height="10" rx="2" fill="none" stroke="#BFA37A" stroke-width="1.2"/>
+            <rect x="20" y="65" width="14" height="10" rx="2" fill="none" stroke="#BFA37A" stroke-width="1.2"/>
+            <circle cx="27" cy="40" r="24" fill="none" stroke="#BFA37A" stroke-width="1.5"/>
+            <circle cx="27" cy="40" r="18" fill="none" stroke="#BFA37A" stroke-width=".5" opacity=".4"/>
+            <circle cx="27" cy="40" r="2" fill="#BFA37A" opacity=".8"/>
+            <line x1="27" y1="40" x2="27" y2="25" stroke="#BFA37A" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="27" y1="40" x2="37" y2="40" stroke="#BFA37A" stroke-width=".8" stroke-linecap="round"/>
+            <line x1="27" y1="18" x2="27" y2="21" stroke="#BFA37A" stroke-width="1"/>
+            <line x1="27" y1="59" x2="27" y2="62" stroke="#BFA37A" stroke-width="1"/>
+            <line x1="6" y1="40" x2="9" y2="40" stroke="#BFA37A" stroke-width="1"/>
+            <line x1="45" y1="40" x2="48" y2="40" stroke="#BFA37A" stroke-width="1"/>
+            <rect x="57" y="25" width="36" height="28" rx="3" fill="none" stroke="#BFA37A" stroke-width="1"/>
+            <line x1="63" y1="33" x2="87" y2="33" stroke="#BFA37A" stroke-width=".8"/>
+            <line x1="63" y1="38" x2="80" y2="38" stroke="#BFA37A" stroke-width=".6"/>
+            <line x1="63" y1="43" x2="84" y2="43" stroke="#BFA37A" stroke-width=".6"/>
+          </svg>
+        </div>
+        <div class="comp-cta">Ver Colección →</div>
+      </div>
+    </div>
+
+    <!-- PULSERAS -->
+    <div class="compartment comp-third" onclick="openModal('pulseras')">
+      <div class="velvet-tex"></div>
+      <div class="comp-inner">
+        <div>
+          <div class="comp-category">Colección V</div>
+          <div class="comp-title">Pulseras</div>
+          <div class="comp-count">20 Piezas</div>
+        </div>
+        <div class="comp-visual">
+          <svg class="jv-svg" viewBox="0 0 90 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="45" cy="38" rx="32" ry="16" stroke="#BFA37A" stroke-width="1.5" fill="none"/>
+            <ellipse cx="45" cy="32" rx="32" ry="16" stroke="#BFA37A" stroke-width=".8" fill="none" stroke-dasharray="4 3"/>
+            <circle cx="45" cy="22" r="4" fill="none" stroke="#BFA37A" stroke-width="1.2"/>
+            <circle cx="45" cy="22" r="1.5" fill="#BFA37A" opacity=".6"/>
+            <circle cx="13" cy="38" r="2" fill="#BFA37A" opacity=".4"/>
+            <circle cx="77" cy="38" r="2" fill="#BFA37A" opacity=".4"/>
+          </svg>
+        </div>
+        <div class="comp-cta">Ver →</div>
+      </div>
+    </div>
+
+    <!-- BROCHES -->
+    <div class="compartment comp-third" onclick="openModal('broches')">
+      <div class="velvet-tex"></div>
+      <div class="comp-inner">
+        <div>
+          <div class="comp-category">Colección VI</div>
+          <div class="comp-title">Broches</div>
+          <div class="comp-count">8 Piezas</div>
+        </div>
+        <div class="comp-visual">
+          <svg class="jv-svg" viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="40,10 45,26 62,26 49,36 54,52 40,42 26,52 31,36 18,26 35,26" fill="none" stroke="#BFA37A" stroke-width="1.3"/>
+            <circle cx="40" cy="32" r="6" fill="none" stroke="#BFA37A" stroke-width="1"/>
+            <circle cx="40" cy="32" r="2.5" fill="#BFA37A" opacity=".5"/>
+          </svg>
+        </div>
+        <div class="comp-cta">Ver →</div>
+      </div>
+    </div>
+
+    <!-- COLGANTES -->
+    <div class="compartment comp-third" onclick="openModal('colgantes')">
+      <div class="velvet-tex"></div>
+      <div class="comp-inner">
+        <div>
+          <div class="comp-category">Colección VII</div>
+          <div class="comp-title">Colgantes</div>
+          <div class="comp-count">15 Piezas</div>
+        </div>
+        <div class="comp-visual">
+          <svg class="jv-svg" viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 10 Q40 4 50 10" stroke="#BFA37A" stroke-width="1.2" fill="none"/>
+            <rect x="36" y="8" width="8" height="6" rx="2" fill="none" stroke="#BFA37A" stroke-width="1"/>
+            <line x1="40" y1="14" x2="40" y2="28" stroke="#BFA37A" stroke-width="1"/>
+            <path d="M24 28 C24 50 56 50 56 28 Z" fill="none" stroke="#BFA37A" stroke-width="1.2"/>
+            <circle cx="40" cy="42" r="5" fill="none" stroke="#BFA37A" stroke-width=".9"/>
+            <circle cx="40" cy="42" r="2" fill="#BFA37A" opacity=".5"/>
+          </svg>
+        </div>
+        <div class="comp-cta">Ver →</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="gold-line"></div>
+  <div class="footer-mark">Atelier · Portafolio de Alta Joyería · Todas las piezas con cita previa</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-eyebrow" id="modal-eyebrow"></div>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc" id="modal-desc"></p>
+      <div class="gallery-grid" id="modal-gallery"></div>
+      <div class="modal-detail" id="modal-detail"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const data = {
+  collares:{
+    eyebrow:'Colección I · Collares',title:'Collares',
+    desc:'Una selección de 24 collares excepcionales elaborados en oro de 18k y platino. Cada pieza es testimonio del dominio de nuestro taller — desde delicadas cadenas adornadas con piedras preciosas raras hasta imponentes declaraciones escultóricas.',
+    pieces:[{l:'Perlas de Luna',m:'Oro y Piedra Luna'},{l:'Cascada Dorada',m:'Oro 18k'},{l:'Estrella del Norte',m:'Diamantes'},{l:'Velo de Luz',m:'Platino'},{l:'Noche de Verano',m:'Zafiros'},{l:'La Reina',m:'Esmeraldas'}],
+    details:[{l:'Materiales',v:'Oro 18k, Platino'},{l:'Piedras',v:'Diamantes, Zafiros'},{l:'Artesanía',v:'Taller Bogotá'},{l:'Piezas',v:'24 obras únicas'}]
+  },
+  anillos:{
+    eyebrow:'Colección II · Anillos',title:'Anillos',
+    desc:'18 anillos singulares que van desde solitarios de claridad excepcional hasta composiciones escultóricas en argolla. Cada anillo es engastado a mano en nuestro taller y terminado con nuestra pátina de terciopelo característica.',
+    pieces:[{l:'Solsticio',m:'Solitario de Diamante'},{l:'Eternidad',m:'Argolla — Diamantes'},{l:'Jardín Secreto',m:'Corte Esmeralda'},{l:'Luna Nueva',m:'Diamante Negro'},{l:'Aurora',m:'Oro Rosa'},{l:'Horizonte',m:'Platino'}],
+    details:[{l:'Materiales',v:'Platino, Oro 18k'},{l:'Piedras',v:'Diamantes, Rubíes'},{l:'Artesanía',v:'Taller Medellín'},{l:'Piezas',v:'18 obras únicas'}]
+  },
+  aretes:{
+    eyebrow:'Colección III · Aretes',title:'Aretes',
+    desc:'32 pares que van desde discretos aretes de un solo diamante hasta colgantes en cascada que se mueven con precisión arquitectónica. Elaborados para la mujer que entiende que la sobriedad es en sí misma una forma de opulencia.',
+    pieces:[{l:'Luminaria',m:'Colgantes de Diamante'},{l:'Cascada',m:'Hojas de Oro'},{l:'Espejo',m:'Broches de Platino'},{l:'Vuelo',m:'Colgantes de Perla'},{l:'Noche',m:'Ónix y Oro'},{l:'Alba',m:'Zafiros Rosados'}],
+    details:[{l:'Materiales',v:'Oro 18k, Platino'},{l:'Piedras',v:'Diamantes, Perlas'},{l:'Artesanía',v:'Taller Cartagena'},{l:'Piezas',v:'32 pares únicos'}]
+  },
+  relojes:{
+    eyebrow:'Colección IV · Alta Relojería',title:'Relojes',
+    desc:'12 relojes que representan la cima de la relojería. Cada movimiento es ensamblado por un único maestro relojero durante cientos de horas. Las cajas son terminadas a mano con cinco tratamientos de superficie distintos.',
+    pieces:[{l:'Perpetua',m:'Calendario Perpetuo'},{l:'Torbellino I',m:'Tourbillon Volante'},{l:'Noche Estrellada',m:'Repetición de Minutos'},{l:'Amanecer',m:'Esfera Esqueleto'},{l:'Gran Complicación',m:'Complicación Total'},{l:'Reserva',m:'Reserva de Marcha'}],
+    details:[{l:'Movimiento',v:'Manufactura propia'},{l:'Materiales',v:'Oro 18k, Zafiro'},{l:'Acabado',v:'Estrías de Ginebra'},{l:'Piezas',v:'12 relojes únicos'}]
+  },
+  pulseras:{
+    eyebrow:'Colección V · Pulseras',title:'Pulseras',
+    desc:'20 pulseras desde delgados brazaletes de oro hasta intrincadas composiciones de eslabones engastados con diamantes en pavé. Cada una está formada a partir de un único elemento continuo, expresando maestría estructural y lujo elemental.',
+    pieces:[{l:'Riviera',m:'Pavé de Diamantes'},{l:'Trenza',m:'Trenza de Oro'},{l:'Manguito',m:'Escultural'},{l:'Cadena',m:'Eslabones — Oro'},{l:'Zafiro',m:'Engaste de Zafiro'},{l:'Lisa',m:'Brazalete Simple'}],
+    details:[{l:'Materiales',v:'Oro 18k'},{l:'Piedras',v:'Diamantes, Zafiros'},{l:'Artesanía',v:'Taller Bogotá'},{l:'Piezas',v:'20 piezas únicas'}]
+  },
+  broches:{
+    eyebrow:'Colección VI · Broches',title:'Broches',
+    desc:'8 broches escultóricos que reviven una tradición noble con una sensibilidad contemporánea. Llevados como pieza central en un traje sastre o un abrigo de noche, cada broche transforma la prenda que adorna.',
+    pieces:[{l:'Flor de Noche',m:'Diamantes Negros'},{l:'Pájaro Dorado',m:'Oro Amarillo'},{l:'Constelación',m:'Piedras Mixtas'},{l:'Rama',m:'Esmeraldas y Oro'},{l:'Sol',m:'Diamantes Amarillos'},{l:'Ola',m:'Aguamarinas'}],
+    details:[{l:'Materiales',v:'Oro 18k, Platino'},{l:'Piedras',v:'Diamante Negro y Amarillo'},{l:'Artesanía',v:'Taller Medellín'},{l:'Piezas',v:'8 obras únicas'}]
+  },
+  colgantes:{
+    eyebrow:'Colección VII · Colgantes',title:'Colgantes',
+    desc:'15 colgantes que suspenden una única gema excepcional o forma escultórica contra la piel. La suspensión está diseñada para que cada pieza se mueva de forma natural, captando la luz con cada gesto.',
+    pieces:[{l:'Gota de Oro',m:'Gota de Oro'},{l:'Lágrima de Luna',m:'Piedra Luna'},{l:'Corazón Negro',m:'Ónix'},{l:'El Infinito',m:'Forma Infinita'},{l:'Pétalo',m:'Cuarzo Rosa'},{l:'Destello',m:'Diamante Bruto'}],
+    details:[{l:'Materiales',v:'Oro 18k, Platino'},{l:'Piedras',v:'Varias piedras preciosas'},{l:'Artesanía',v:'Taller Cali'},{l:'Piezas',v:'15 piezas únicas'}]
+  }
+};
+
+function openModal(id){
+  const d=data[id];if(!d)return;
+  document.getElementById('modal-eyebrow').textContent=d.eyebrow;
+  document.getElementById('modal-title').textContent=d.title;
+  document.getElementById('modal-desc').textContent=d.desc;
+  const g=document.getElementById('modal-gallery');
+  g.innerHTML=d.pieces.map(p=>`<div class="gallery-item"><div style="text-align:center;padding:12px"><div style="font-family:'Playfair Display',serif;font-size:13px;color:#BFA37A;margin-bottom:4px">${p.l}</div><div style="font-size:10px;color:#555;letter-spacing:1px">${p.m}</div></div></div>`).join('');
+  const det=document.getElementById('modal-detail');
+  det.innerHTML=d.details.map(i=>`<div class="detail-item"><div class="detail-label">${i.l}</div><div class="detail-val">${i.v}</div></div>`).join('');
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function handleOverlayClick(e){
+  if(e.target===document.getElementById('modal'))closeModal();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+</script>
+</body>
+</html>
